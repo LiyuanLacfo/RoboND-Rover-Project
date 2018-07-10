@@ -1,8 +1,10 @@
 import numpy as np
+import time
 
 
 # This is where you can build a decision tree for determining throttle, brake and steer 
 # commands based on the output of the perception_step() function
+EPSILON = 0.000000000001
 def decision_step(Rover):
 
     # Implement conditionals to decide what to do given perception data
@@ -11,9 +13,35 @@ def decision_step(Rover):
 
     # Example:
     # Check if we have vision data to make decisions with
+
+    #check if stuck
+    if time.time() - Rover.prev_pos_time > 10:
+        prev_x, prev_y = Rover.prev_pos
+        cur_x, cur_y = Rover.pos
+        if abs(prev_x-cur_x)+abs(prev_y-cur_y) < 0.5:
+            Rover.mode = 'stuck'
+        else:
+            Rover.prev_pos_time = time.time()
+            Rover.prev_pos = Rover.pos
+
+
+    #check whether robot is running a cycle
+    if(abs(Rover.steer+15) < EPSILON or (Rover.steer-15)<EPSILON) and Rover.mode == 'forward':
+        if Rover.cycle_start_time < 0:
+            Rover.cycle_start_time = time.time()
+        elif time.time() - Rover.cycle_start_time > 10: #if keep turning at the maximum steering angle for more than 10 secs, we are sure it is in cycle mode
+            Rover.mode = 'cycle'
+            print('Enter cycle mode')
+    else:
+        Rover.cycle_start_time = -1.0
+
+
+
     if Rover.nav_angles is not None:
+
         # Check for Rover.mode status
         if Rover.mode == 'forward': 
+            print('here')
             # Check the extent of navigable terrain
             if len(Rover.nav_angles) >= Rover.stop_forward:  
                 # If mode is forward, navigable terrain looks good 
@@ -60,6 +88,21 @@ def decision_step(Rover):
                     # Set steer to mean angle
                     Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
                     Rover.mode = 'forward'
+        elif Rover.mode == 'cycle':
+            Rover.throttle = 0
+            Rover.brake = Rover.brake_set
+            if Rover.steer < 0:
+                Rover.steer = 15
+            else:
+                Rover.steer = -15
+            Rover.mode = 'forward'
+            Rover.cycle_start_time = -1
+        elif Rover.mode == 'stuck':
+            Rover.brake = Rover.brake_set
+            Rover.throttle = -2
+            Rover.steer =  -40 if Rover.steer > 0 else 40
+            if len(Rover.nav_angles) > Rover.go_forward:
+                Rover.mode = 'forward'
     # Just to make the rover do something 
     # even if no modifications have been made to the code
     else:
@@ -70,6 +113,8 @@ def decision_step(Rover):
     # If in a state where want to pickup a rock send pickup command
     if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up:
         Rover.send_pickup = True
-    
+    print("mode: ", Rover.mode)
+    print("Rover start cycle time: ", Rover.cycle_start_time)
+    print("steer angle: ", Rover.steer)
     return Rover
 

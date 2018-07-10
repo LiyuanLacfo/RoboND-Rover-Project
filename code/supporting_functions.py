@@ -17,6 +17,8 @@ def update_rover(Rover, data):
       # Initialize start time and sample positions
       if Rover.start_time == None:
             Rover.start_time = time.time()
+            Rover.prev_pos_time = Rover.start_time
+            Rover.prev_pos = [convert_to_float(pos.strip()) for pos in data["position"].split(';')]
             Rover.total_time = 0
             samples_xpos = np.int_([convert_to_float(pos.strip()) for pos in data["samples_x"].split(';')])
             samples_ypos = np.int_([convert_to_float(pos.strip()) for pos in data["samples_y"].split(';')])

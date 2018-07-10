@@ -42,6 +42,8 @@ class RoverState():
         self.total_time = None # To record total duration of naviagation
         self.img = None # Current camera image
         self.pos = None # Current position (x, y)
+        self.prev_pos = None
+        self.prev_pos_time = None
         self.yaw = None # Current yaw angle
         self.pitch = None # Current pitch angle
         self.roll = None # Current roll angle
@@ -77,6 +79,8 @@ class RoverState():
         self.near_sample = 0 # Will be set to telemetry value data["near_sample"]
         self.picking_up = 0 # Will be set to telemetry value data["picking_up"]
         self.send_pickup = False # Set to True to trigger rock pickup
+
+        self.cycle_start_time = -1.0
 # Initialize our rover 
 Rover = RoverState()
 
