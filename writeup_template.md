@@ -40,8 +40,6 @@ You're reading it!
 #### 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
 Here is an example of how to include an image in your writeup.
 
-![alt text][image1]
-
 #### 1. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result. 
 And another! 
 
@@ -67,14 +65,13 @@ Then for the `decision_step()`. Actually, this function can be used without modi
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further. 
 
-The simulator setting is 640*480 with good quality. 
+The simulator setting is 640*480 with good quality. The fps is 38.
+![performance](https://github.com/LiyuanLacfo/RoboND-Rover-Project/blob/master/result_images/performance.jpg)
 
 First, the fidelity decreases a lot while in the shadow area. It seems that the color threshold method to find navigable area does not perform well when there is shadow. 
 
-Second 
+Second, sometimes the rover would get stuck, some more decisions need to be implemented.
 
 
-
-![alt text][image3]
 
 
