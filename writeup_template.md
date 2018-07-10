@@ -38,10 +38,27 @@ You're reading it!
 
 ### Notebook Analysis
 #### 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
-Here is an example of how to include an image in your writeup.
+
+Since the navigable pixels have high values in all channels, the color threshold method can be used to separate navigable area from obstacle area. After trying some threshold values, `(160, 160, 160)` is selected. The obstacle pixels are those that are not navigable pixels.
+
+To mark the rover in the world map, the coordinates of the image need to be adjusted and placed in the coordinates of the world map. As for how to find `rocks`, the rgb color of rock is identified as (147, 127, 21), and the corresponding hsv is (24, 214, 142). By referring to [this](https://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html), the lower bound of hsv value and upper bound of hsv value are set to `(14, 100, 100)` and `(34, 255, 255)`. 
+
+
+
+
 
 #### 1. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result. 
-And another! 
+
+Since the view of the world map is of eagle's view, we need to first transform the perspective of the images taken from the camera in front of the rover. 
+
+Second, since the navigable pixels have high values in all channels, the color threshold method can be used to separate navigable area from obstacle area. After trying some threshold values, `(160, 160, 160)` is selected. 
+
+Third, to mark the rover in the world map, the coordinates of the image need to be adjusted and placed in the coordinates of the world map. As for how to find `rocks`, the rgb color of rock is identified as (147, 127, 21), and the corresponding hsv is (24, 214, 142). By referring to [this](https://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html), the lower bound of hsv value and upper bound of hsv value are set to `(14, 100, 100)` and `(34, 255, 255)`. 
+
+The world map is created by filling the first channel with obstacle pixels and the third channel with the navigable pixels and all three channels with rock pixels if they exist.
+
+
+
 
 ### Autonomous Navigation and Mapping
 
