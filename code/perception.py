@@ -145,8 +145,11 @@ def perception_step(Rover):
                                                     Rover.pos[1], Rover.yaw, 200, scale)
     x_pix_world_cur_loc, y_pix_world_cur_loc = pix_to_world(x_pix_cur_loc, y_pix_cur_loc, Rover.pos[0],
                                                     Rover.pos[1], Rover.yaw, 200, scale)
-    Rover.worldmap[y_pix_world_obstacle, x_pix_world_obstacle, 0] += 1
-    Rover.worldmap[y_pix_world_nav, x_pix_world_nav, 2] += 10
+
+    #update world map only when rover in normal view
+    if (Rover.pitch < 0.5 or Rover.pitch > 359.5) and (Rover.roll < 0.5 or Rover.roll > 359.5):
+        Rover.worldmap[y_pix_world_obstacle, x_pix_world_obstacle, 0] += 1
+        Rover.worldmap[y_pix_world_nav, x_pix_world_nav, 2] += 10
     # Rover.worldmap[y_pix_world_cur_loc, x_pix_world_cur_loc, :] = 255
     #find rock
     rock_mask = find_rock(img)
@@ -156,7 +159,8 @@ def perception_step(Rover):
         x_pix_rock, y_pix_rock = rover_coords(warped_rock)
         x_pix_world_rock, y_pix_world_rock = pix_to_world(x_pix_rock, y_pix_rock, Rover.pos[0], 
                                                     Rover.pos[1], Rover.yaw, 200, scale)
-        Rover.worldmap[y_pix_world_rock, x_pix_world_rock, :] = 255
+        if (Rover.pitch < 0.5 or Rover.pitch > 359.5) and (Rover.roll < 0.5 or Rover.roll > 359.5):
+            Rover.worldmap[y_pix_world_rock, x_pix_world_rock, :] = 255
         Rover.vision_image[:, :, 2] = rock_mask #update Rover.vision_image
     else:
         Rover.vision_image[:, :, 2] = 0
