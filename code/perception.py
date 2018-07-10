@@ -126,8 +126,8 @@ def perception_step(Rover):
                   ])
     warped, mask = perspect_transform(img, source, destination)
     #tell where I am
-    # cur_loc = np.zeros_like(mask)
-    # cur_loc[img.shape[0]-1][img.shape[1]//2] = 1
+    cur_loc = np.zeros_like(mask)
+    cur_loc[img.shape[0]-1][img.shape[1]//2] = 1
     navigable = color_thresh(warped)*mask
     obstacle = (1-navigable)*mask
     #update Rover.vision_image

@@ -51,8 +51,12 @@ And another!
 #### 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
 
 First for the `perception_step()` function, it mainly deals with how to process the image and extract information from the image to navigate the rover. Since the view of the world map is of eagle's view, we need to first transform the perspective of the images taken from the camera in front of the rover. 
-![image after perspective transform]()
-Second, since the navigable pixels have high values in all channels, the color threshold method can be used to separate navigable area from obstacle area. After trying some threshold values, `(160, 160, 160)` is selected. Third, to mark the rover in the world map, the coordinates of the image need to be adjusted and placed in the coordinates of the world map. As for how to find `rocks`, the rgb color of rock is identified as (147, 127, 21), and the corresponding hsv is (24, 214, 142). By referring to [this](https://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html), the lower bound of hsv value and upper bound of hsv value are set to `(14, 100, 100)` and `(34, 255, 255)`. 
+![image for perspective transform](https://github.com/LiyuanLacfo/RoboND-Rover-Project/blob/master/result_images/example_grid1.jpg)
+
+![image after perspective transform](https://github.com/LiyuanLacfo/RoboND-Rover-Project/blob/master/result_images/perspective_transform.jpg)
+Second, since the navigable pixels have high values in all channels, the color threshold method can be used to separate navigable area from obstacle area. After trying some threshold values, `(160, 160, 160)` is selected. 
+![image after color threshold](https://github.com/LiyuanLacfo/RoboND-Rover-Project/blob/master/result_images/thresh.jpg)
+Third, to mark the rover in the world map, the coordinates of the image need to be adjusted and placed in the coordinates of the world map. As for how to find `rocks`, the rgb color of rock is identified as (147, 127, 21), and the corresponding hsv is (24, 214, 142). By referring to [this](https://docs.opencv.org/3.2.0/df/d9d/tutorial_py_colorspaces.html), the lower bound of hsv value and upper bound of hsv value are set to `(14, 100, 100)` and `(34, 255, 255)`. 
 
 Then for the `decision_step()`. Actually, this function can be used without modification. But after some tests of autonomous mode, the rover sometimes would move in a cycle. Thus a decision to break the cycle is added. While cycling, the steering angle of the rover is always `15` or `-15`. If the steering angle keep those values for more than 10 seconds, the rover enter into `cycle` mode. The rover would first break and steer to another side then go into `forward` mode.  
 
@@ -63,7 +67,11 @@ Then for the `decision_step()`. Actually, this function can be used without modi
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further. 
 
-First, the fidelity decreases a lot while in the shadow area. It seems  
+The simulator setting is 640*480 with good quality. 
+
+First, the fidelity decreases a lot while in the shadow area. It seems that the color threshold method to find navigable area does not perform well when there is shadow. 
+
+Second 
 
 
 
