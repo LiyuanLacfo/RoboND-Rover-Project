@@ -81,7 +81,7 @@ def perspect_transform(img, src, dst):
 #function to find rock, where rock is 255
 def find_rock(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-    lower, upper = np.array([14, 100, 100]), np.array([30, 255, 255])
+    lower, upper = np.array([19, 190, 100]), np.array([30, 255, 255])
     mask = cv2.inRange(hsv, lower, upper)
     return mask
 
@@ -157,6 +157,7 @@ def perception_step(Rover):
     if np.any(rock_mask):
         warped_rock, _ = perspect_transform(rock_mask, source, destination)
         x_pix_rock, y_pix_rock = rover_coords(warped_rock)
+        Rover.rock_dists, Rover.rock_angles = to_polar_coords(x_pix_rock, y_pix_rock)
         x_pix_world_rock, y_pix_world_rock = pix_to_world(x_pix_rock, y_pix_rock, Rover.pos[0], 
                                                     Rover.pos[1], Rover.yaw, 200, scale)
         if (Rover.pitch < 0.5 or Rover.pitch > 359.5) and (Rover.roll < 0.5 or Rover.roll > 359.5):

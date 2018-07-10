@@ -15,6 +15,8 @@ def decision_step(Rover):
     # Check if we have vision data to make decisions with
 
     #check if stuck
+    print('Prev time ', Rover.prev_pos_time)
+    print('Cur time ', time.time())
     if time.time() - Rover.prev_pos_time > 10:
         prev_x, prev_y = Rover.prev_pos
         cur_x, cur_y = Rover.pos
@@ -35,13 +37,15 @@ def decision_step(Rover):
     else:
         Rover.cycle_start_time = -1.0
 
+    if Rover.rock_dists is not None and len(Rover.rock_dists) > 0:
+        print('pick up !!!!!!!!')
+        Rover.mode = 'pick_up'
 
 
     if Rover.nav_angles is not None:
 
         # Check for Rover.mode status
-        if Rover.mode == 'forward': 
-            print('here')
+        if Rover.mode == 'forward':
             # Check the extent of navigable terrain
             if len(Rover.nav_angles) >= Rover.stop_forward:  
                 # If mode is forward, navigable terrain looks good 
@@ -56,6 +60,7 @@ def decision_step(Rover):
                 Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
             # If there's a lack of navigable terrain pixels then go to 'stop' mode
             elif len(Rover.nav_angles) < Rover.stop_forward:
+                    print('here 111')
                     # Set mode to "stop" and hit the brakes!
                     Rover.throttle = 0
                     # Set brake to stored brake value
@@ -98,11 +103,24 @@ def decision_step(Rover):
             Rover.mode = 'forward'
             Rover.cycle_start_time = -1
         elif Rover.mode == 'stuck':
-            Rover.brake = Rover.brake_set
-            Rover.throttle = -2
-            Rover.steer =  -40 if Rover.steer > 0 else 40
-            if len(Rover.nav_angles) > Rover.go_forward:
+            if not Rover.start_rolling_time: Rover.start_rolling_time = time.time()
+            if time.time() - Rover.start_rolling_time > 2:
                 Rover.mode = 'forward'
+                Rover.start_rolling_time = None
+                Rover.prev_pos_time = time.time()
+            else:
+                Rover.throttle = 0
+                Rover.brake = 0
+                Rover.steer = -15
+
+        elif Rover.mode == 'pick_up' and len(Rover.rock_dists) > 0:
+            if max(Rover.rock_dists) < 20:
+                Rover.throttle = 0
+                Rover.brake = Rover.brake_set
+                Rover.steer = 0
+            else:
+                Rover.throttle = 0 if Rover.vel >= 0.5 else 0.2
+                Rover.steer = np.clip(np.mean(Rover.rock_angles * 180/np.pi), -15, 15)
     # Just to make the rover do something 
     # even if no modifications have been made to the code
     else:
@@ -113,8 +131,16 @@ def decision_step(Rover):
     # If in a state where want to pickup a rock send pickup command
     if Rover.near_sample and Rover.vel == 0 and not Rover.picking_up:
         Rover.send_pickup = True
-    print("mode: ", Rover.mode)
-    print("Rover start cycle time: ", Rover.cycle_start_time)
-    print("steer angle: ", Rover.steer)
+        if len(Rover.nav_angles) >= Rover.go_forward:
+            # Set steer to mean angle
+            Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+            Rover.mode = 'forward'
+        else:
+            Rover.throttle = 0
+            # Release the brake to allow turning
+            Rover.brake = 0
+            # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
+            Rover.mode = 'stop'
+    print('mode: ', Rover.mode)
     return Rover
 
